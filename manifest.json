@@ -1,0 +1,21 @@
+{
+  "name": "MEU ESPAÇO TERAPÊUTICO",
+  "short_name": "Espaço",
+  "description": "App terapêutico para registrar sentimentos e emoções.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f0f8ff",
+  "theme_color": "#007acc",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
