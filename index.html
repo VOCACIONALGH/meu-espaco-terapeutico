@@ -1,290 +1,160 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>MEU ESPAÇO TERAPÊUTICO</title>
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#007acc">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            font-size: 12px;
-            margin: 0;
-            min-height: 100vh;
-            background-color: #f0f8ff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-        }
-        h2 {
-            font-family: Arial;
-            font-size: 20px;
-            color: #007acc;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-        }
-        .container {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            align-items: center;
-            width: 95%;
-            max-width: 400px;
-        }
-        form {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-        form label {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        textarea, input[type="text"], .emocoes-list button {
-            width: 100%;
-            padding: 10px;
-            font-size: 12px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            font-family: Arial;
-            margin-bottom: 10px; /* espaçamento vertical */
-        }
-        textarea {
-            height: 150px;
-            resize: vertical;
-        }
-        .emocoes-list {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 5px;
-            max-height: 200px;
-            overflow-y: auto;
-            border: 1px solid #ccc;
-            padding: 5px;
-            border-radius: 5px;
-            margin-bottom: 10px;
-        }
-        .emocoes-list button {
-            cursor: pointer;
-            background-color: #fff;
-            border: 1px solid #007acc;
-            color: #007acc;
-            border-radius: 5px;
-            font-family: Arial;
-            font-size: 12px;
-            padding: 8px;
-            text-align: center;
-        }
-        .emocoes-list button.selected {
-            background-color: #007acc;
-            color: #fff;
-        }
-        button[type="submit"], .modo-cosmos {
-            margin-top: 15px;
-            border: none;
-            background-color: #007acc;
-            color: #fff;
-            cursor: pointer;
-            font-size: 12px;
-            border-radius: 5px;
-            font-family: Arial;
-            padding: 10px;
-        }
-        button[type="submit"]:hover, .modo-cosmos:hover {
-            background-color: #005f99;
-        }
-        #resultado {
-            padding: 15px;
-            background-color: #e6f7ff;
-            border-radius: 10px;
-            width: 100%;
-            word-wrap: break-word;
-            min-height: 200px;
-            text-align: justify;
-        }
-        .resultado-item {
-            margin-bottom: 10px;
-        }
-        .resultado-item strong {
-            display: inline-block;
-            width: 140px;
-            text-align: right;
-            margin-right: 10px;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MEU ESPAÇO TERAPÊUTICO</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#007acc">
+  <style>
+    body { font-family: Arial; font-size: 12px; margin: 0; min-height:100vh;
+      background:#f0f8ff; display:flex; justify-content:center; align-items:center; flex-direction:column;}
+    h2 { font-size:20px; text-transform:uppercase; color:#007acc; margin-bottom:20px;}
+    .container { display:flex; flex-direction:column; gap:20px; align-items:center; width:95%; max-width:400px;}
+    form { background:#fff; padding:20px; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.1);
+      width:100%; display:flex; flex-direction:column;}
+    form label { font-weight:bold; margin-bottom:5px;}
+    textarea, input[type="text"], .emocoes-list button { width:100%; padding:10px; font-size:12px; border-radius:5px;
+      border:1px solid #ccc; font-family:Arial; margin-bottom:10px;}
+    textarea { height:150px; resize:vertical;}
+    .emocoes-list { display:grid; grid-template-columns:repeat(2,1fr); gap:5px; max-height:200px; overflow-y:auto;
+      border:1px solid #ccc; padding:5px; border-radius:5px; margin-bottom:10px;}
+    .emocoes-list button { cursor:pointer; background:#fff; border:1px solid #007acc; color:#007acc; border-radius:5px;
+      padding:8px; font-size:12px; text-align:center;}
+    .emocoes-list button.selected { background:#007acc; color:#fff;}
+    button[type="submit"], .modo-cosmos { margin-top:15px; border:none; background:#007acc; color:#fff;
+      cursor:pointer; font-size:12px; border-radius:5px; padding:10px;}
+    button[type="submit"]:hover, .modo-cosmos:hover { background:#005f99;}
+    #resultado { padding:15px; background:#e6f7ff; border-radius:10px; width:100%; word-wrap:break-word;
+      min-height:200px; text-align:justify;}
+    .resultado-item { margin-bottom:10px;}
+    .resultado-item strong { display:inline-block; width:140px; text-align:right; margin-right:10px;}
+  </style>
 </head>
 <body>
-    <div class="container" id="mainContainer">
-        <h2>MEU ESPAÇO TERAPÊUTICO</h2>
+<div class="container">
+  <h2>MEU ESPAÇO TERAPÊUTICO</h2>
 
-        <form id="relatoForm">
-            <label><b>Quero dizer que...</b></label>
-            <label for="meuRelato">Meu relato:</label>
-            <textarea id="meuRelato" name="meuRelato" placeholder="Escreva aqui como você está se sentindo..."></textarea>
+  <form id="relatoForm">
+    <label><b>Quero dizer que...</b></label>
+    <label for="meuRelato">Meu relato:</label>
+    <textarea id="meuRelato" placeholder="Escreva aqui como você está se sentindo..."></textarea>
 
-            <label for="palavraMomento">A palavra do momento é:</label>
-            <input type="text" id="palavraMomento" name="palavraMomento" placeholder="Digite a palavra do momento...">
+    <label for="palavraMomento">A palavra do momento é:</label>
+    <input type="text" id="palavraMomento" placeholder="Digite a palavra do momento...">
 
-            <label>Escolha três emoções predominantes:</label>
-            <div class="emocoes-list" id="emocoesList">
-                <button type="button">Alegria</button>
-                <button type="button">Tristeza</button>
-                <button type="button">Raiva</button>
-                <button type="button">Medo</button>
-                <button type="button">Surpresa</button>
-                <button type="button">Nojo</button>
-                <button type="button">Amor</button>
-                <button type="button">Calma</button>
-                <button type="button">Ansiedade</button>
-                <button type="button">Esperança</button>
-                <button type="button">Solidão</button>
-                <button type="button">Culpa</button>
-                <button type="button">Orgulho</button>
-                <button type="button">Frustração</button>
-                <button type="button">Confiança</button>
-                <button type="button">Tédio</button>
-                <button type="button">Admiração</button>
-                <button type="button">Compaixão</button>
-                <button type="button">Inveja</button>
-                <button type="button">Gratidão</button>
-                <button type="button">Entusiasmo</button>
-                <button type="button">Decepção</button>
-                <button type="button">Paz</button>
-                <button type="button">Ira</button>
-                <button type="button">Desânimo</button>
-                <button type="button">Curiosidade</button>
-                <button type="button">Alívio</button>
-                <button type="button">Empolgação</button>
-                <button type="button">Confusão</button>
-                <button type="button">Inquietação</button>
-                <button type="button">Admiração leve</button>
-                <button type="button">Saudade</button>
-                <button type="button">Orgulho leve</button>
-                <button type="button">Solidariedade</button>
-                <button type="button">Surpresa positiva</button>
-                <button type="button">Medo leve</button>
-                <button type="button">Raiva contida</button>
-                <button type="button">Satisfação</button>
-                <button type="button">Altruísmo</button>
-            </div>
-        </form>
-
-        <form id="queroSentirForm">
-            <label><b>Quero sentir que...</b></label>
-            <input type="text" id="queroSentirInput" placeholder="tudo vai dar certo...">
-            <button type="submit">Ressignificar</button>
-            <button type="button" class="modo-cosmos" id="modoCosmosBtn">Modo Cosmos</button>
-        </form>
-
-        <div id="resultado"></div>
+    <label>Escolha três emoções predominantes:</label>
+    <div class="emocoes-list" id="emocoesList">
+      <!-- 40 emoções -->
+      <button type="button">Alegria</button><button type="button">Tristeza</button>
+      <button type="button">Raiva</button><button type="button">Medo</button>
+      <button type="button">Surpresa</button><button type="button">Nojo</button>
+      <button type="button">Amor</button><button type="button">Calma</button>
+      <button type="button">Ansiedade</button><button type="button">Esperança</button>
+      <button type="button">Solidão</button><button type="button">Culpa</button>
+      <button type="button">Orgulho</button><button type="button">Frustração</button>
+      <button type="button">Confiança</button><button type="button">Tédio</button>
+      <button type="button">Admiração</button><button type="button">Compaixão</button>
+      <button type="button">Inveja</button><button type="button">Gratidão</button>
+      <button type="button">Entusiasmo</button><button type="button">Decepção</button>
+      <button type="button">Paz</button><button type="button">Ira</button>
+      <button type="button">Desânimo</button><button type="button">Curiosidade</button>
+      <button type="button">Alívio</button><button type="button">Empolgação</button>
+      <button type="button">Confusão</button><button type="button">Inquietação</button>
+      <button type="button">Admiração leve</button><button type="button">Saudade</button>
+      <button type="button">Orgulho leve</button><button type="button">Solidariedade</button>
+      <button type="button">Surpresa positiva</button><button type="button">Medo leve</button>
+      <button type="button">Raiva contida</button><button type="button">Satisfação</button>
+      <button type="button">Altruísmo</button>
     </div>
+  </form>
 
-    <script>
-        const form = document.getElementById('queroSentirForm');
-        const resultadoDiv = document.getElementById('resultado');
-        const emocoesList = document.getElementById('emocoesList');
-        const modoCosmosBtn = document.getElementById('modoCosmosBtn');
-        let selectedEmocoes = [];
-        let cosmosContent = [];
+  <form id="queroSentirForm">
+    <label><b>Quero sentir que...</b></label>
+    <input type="text" id="queroSentirInput" placeholder="tudo vai dar certo...">
+    <button type="submit">Ressignificar</button>
+    <button type="button" class="modo-cosmos" id="modoCosmosBtn">Modo Cosmos</button>
+  </form>
 
-        emocoesList.querySelectorAll('button').forEach(button => {
-            button.addEventListener('click', () => {
-                const value = button.textContent;
-                if(button.classList.contains('selected')) {
-                    button.classList.remove('selected');
-                    selectedEmocoes = selectedEmocoes.filter(e => e !== value);
-                } else {
-                    if(selectedEmocoes.length < 3) {
-                        button.classList.add('selected');
-                        selectedEmocoes.push(value);
-                    }
-                }
-            });
-        });
+  <div id="resultado"></div>
+</div>
 
-        form.addEventListener('submit', function(event) {
-            event.preventDefault();
-            const relato = document.getElementById('meuRelato').value.trim();
-            const palavra = document.getElementById('palavraMomento').value.trim();
-            const queroSentir = document.getElementById('queroSentirInput').value.trim();
+<script>
+const form = document.getElementById('queroSentirForm');
+const resultadoDiv = document.getElementById('resultado');
+const emocoesList = document.getElementById('emocoesList');
+const modoCosmosBtn = document.getElementById('modoCosmosBtn');
+let selectedEmocoes = [];
+let cosmosContent = [];
 
-            if(relato || palavra || selectedEmocoes.length > 0 || queroSentir) {
-                let resultadoHTML = '';
-                if(relato) resultadoHTML += `<div class="resultado-item"><strong>Seu relato:</strong> ${escapeHtml(relato)}</div>`;
-                if(palavra) resultadoHTML += `<div class="resultado-item"><strong>Sua palavra:</strong> ${escapeHtml(palavra)}</div>`;
-                if(selectedEmocoes.length>0) resultadoHTML += `<div class="resultado-item"><strong>Suas emoções:</strong> ${selectedEmocoes.map(escapeHtml).join(', ')}</div>`;
-                if(queroSentir) resultadoHTML += `<div class="resultado-item"><strong>O que você quer sentir:</strong> ${escapeHtml(queroSentir)}</div>`;
-                resultadoDiv.innerHTML = resultadoHTML;
+emocoesList.querySelectorAll('button').forEach(button=>{
+  button.addEventListener('click', ()=>{
+    const value = button.textContent;
+    if(button.classList.contains('selected')){
+      button.classList.remove('selected');
+      selectedEmocoes = selectedEmocoes.filter(e=>e!==value);
+    }else{
+      if(selectedEmocoes.length<3){
+        button.classList.add('selected');
+        selectedEmocoes.push(value);
+      }
+    }
+  });
+});
 
-                // Adiciona ao cosmosContent
-                cosmosContent.push(resultadoHTML);
-            } else {
-                resultadoDiv.innerHTML = `<p style="color:red;">Por favor, preencha ao menos um campo antes de enviar.</p>`;
-            }
-        });
+form.addEventListener('submit', event=>{
+  event.preventDefault();
+  const relato = document.getElementById('meuRelato').value.trim();
+  const palavra = document.getElementById('palavraMomento').value.trim();
+  const queroSentir = document.getElementById('queroSentirInput').value.trim();
+  if(relato||palavra||selectedEmocoes.length>0||queroSentir){
+    let resultadoHTML='';
+    if(relato) resultadoHTML+=`<div class="resultado-item"><strong>Seu relato:</strong> ${escapeHtml(relato)}</div>`;
+    if(palavra) resultadoHTML+=`<div class="resultado-item"><strong>Sua palavra:</strong> ${escapeHtml(palavra)}</div>`;
+    if(selectedEmocoes.length>0) resultadoHTML+=`<div class="resultado-item"><strong>Suas emoções:</strong> ${selectedEmocoes.map(escapeHtml).join(', ')}</div>`;
+    if(queroSentir) resultadoHTML+=`<div class="resultado-item"><strong>O que você quer sentir:</strong> ${escapeHtml(queroSentir)}</div>`;
+    resultadoDiv.innerHTML = resultadoHTML;
+    cosmosContent.push(resultadoHTML);
+  }else{
+    resultadoDiv.innerHTML=`<p style="color:red;">Por favor, preencha ao menos um campo antes de enviar.</p>`;
+  }
+});
 
-        modoCosmosBtn.addEventListener('click', () => {
-            document.body.innerHTML = `<div id="cosmosContainer" style="position:relative;width:100vw;height:100vh;background-color:#000;"></div>
-                <button id="sairCosmos" style="position:fixed;bottom:20px;left:50%;transform:translateX(-50%);padding:10px;border-radius:5px;border:none;background-color:#007acc;color:white;cursor:pointer;font-family:Arial;font-size:12px;">Sair do Modo Cosmos</button>`;
-            const container = document.getElementById('cosmosContainer');
-            const positions = [];
-            const margin = 20;
+modoCosmosBtn.addEventListener('click', ()=>{
+  document.body.innerHTML = `<div id="cosmosContainer" style="position:relative;width:100vw;height:100vh;background:#000;"></div>
+    <button id="sairCosmos" style="position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+    padding:10px;border-radius:5px;border:none;background:#007acc;color:white;cursor:pointer;font-family:Arial;font-size:12px;">Sair do Modo Cosmos</button>`;
+  const container=document.getElementById('cosmosContainer');
+  const positions=[]; const margin=20;
+  cosmosContent.forEach(item=>{
+    const div=document.createElement('div');
+    div.innerHTML=item;
+    div.style.position='absolute';
+    div.style.background='rgba(1,1,20,0.7)';
+    div.style.color='#e6f7ff';
+    div.style.padding='10px';
+    div.style.borderRadius='8px';
+    div.style.maxWidth='300px';
+    div.style.wordWrap='break-word';
+    let placed=false;
+    while(!placed){
+      const left=Math.random()*(window.innerWidth-320);
+      const top=Math.random()*(window.innerHeight-120);
+      const rect={left, top, right:left+300+margin, bottom:top+100+margin};
+      const overlap=positions.some(p=>!(rect.right<p.left||rect.left>p.right||rect.bottom<p.top||rect.top>p.bottom));
+      if(!overlap){div.style.left=left+'px'; div.style.top=top+'px'; positions.push(rect); placed=true;}
+    }
+    container.appendChild(div);
+  });
+  document.getElementById('sairCosmos').addEventListener('click', ()=> location.reload());
+});
 
-            cosmosContent.forEach(item => {
-                const div = document.createElement('div');
-                div.innerHTML = item;
-                div.style.position = 'absolute';
-                div.style.backgroundColor = 'rgba(1,1,20,0.7)';
-                div.style.color = '#e6f7ff';
-                div.style.padding = '10px';
-                div.style.borderRadius = '8px';
-                div.style.maxWidth = '300px';
-                div.style.wordWrap = 'break-word';
+function escapeHtml(str){return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+  .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/\n/g,'<br>');}
 
-                let placed = false;
-                while(!placed) {
-                    const left = Math.random()*(window.innerWidth-320);
-                    const top = Math.random()*(window.innerHeight-120);
-                    const rect = {left, top, right:left+300+margin, bottom:top+100+margin};
-                    const overlap = positions.some(p => !(rect.right<p.left || rect.left>p.right || rect.bottom<p.top || rect.top>p.bottom));
-                    if(!overlap) {
-                        div.style.left = left+'px';
-                        div.style.top = top+'px';
-                        positions.push(rect);
-                        placed = true;
-                    }
-                }
-                container.appendChild(div);
-            });
-
-            document.getElementById('sairCosmos').addEventListener('click', ()=> location.reload());
-        });
-
-        function escapeHtml(str) {
-            return String(str)
-                .replace(/&/g,'&amp;')
-                .replace(/</g,'&lt;')
-                .replace(/>/g,'&gt;')
-                .replace(/"/g,'&quot;')
-                .replace(/'/g,'&#39;')
-                .replace(/\n/g,'<br>');
-        }
-
-        // Registrar service worker
-        if('serviceWorker' in navigator){
-            window.addEventListener('load', function(){
-                navigator.serviceWorker.register('service-worker.js')
-                .then(reg=>console.log('SW registrado:', reg.scope))
-                .catch(err=>console.log('Falha SW:',err));
-            });
-        }
-    </script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{navigator.serviceWorker.register('service-worker.js');});
+}
+</script>
 </body>
 </html>
