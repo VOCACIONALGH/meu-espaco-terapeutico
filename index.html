@@ -74,14 +74,13 @@ button[type="submit"]:hover, .modo-cosmos:hover { background:#005f99; }
 
 <!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
 <script>
-// 1️⃣ Configuração Firebase (substitua pelas suas credenciais)
+// Configuração Firebase (substitua pelas suas credenciais)
 const firebaseConfig = {
   apiKey: "SUA_API_KEY",
   authDomain: "SEU_PROJETO.firebaseapp.com",
-  databaseURL: "https://SEU_PROJETO-default-rtdb.firebaseio.com",
   projectId: "SEU_PROJETO",
   storageBucket: "SEU_PROJETO.appspot.com",
   messagingSenderId: "SENDER_ID",
@@ -90,8 +89,8 @@ const firebaseConfig = {
 
 // Inicializa Firebase
 firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-const cosmosRef = db.ref('modoCosmos'); // caminho único compartilhado
+const db = firebase.firestore();
+const cosmosRef = db.collection('modoCosmos');
 
 // Seleção de emoções
 const emocoesList = document.getElementById('emocoesList');
@@ -109,7 +108,7 @@ emocoesList.querySelectorAll('button').forEach(button=>{
   });
 });
 
-// Enviar formulário e salvar no Firebase
+// Enviar formulário e salvar no Firestore
 const form = document.getElementById('queroSentirForm');
 const resultadoDiv = document.getElementById('resultado');
 
@@ -119,15 +118,22 @@ form.addEventListener('submit', event=>{
   const palavra = document.getElementById('palavraMomento').value.trim();
   const queroSentir = document.getElementById('queroSentirInput').value.trim();
 
-  if(relato||palavra||selectedEmocoes.length>0||queroSentir){
-    const resultadoHTML = {
-      relato, palavra, emocoes:selectedEmocoes, queroSentir
+  if(relato || palavra || selectedEmocoes.length > 0 || queroSentir){
+    const resultadoData = {
+      relato,
+      palavra,
+      emocoes: selectedEmocoes,
+      queroSentir,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
     };
-    // Salva no Firebase (gerando um ID único)
-    cosmosRef.push(resultadoHTML);
+    // Salva no Firestore
+    cosmosRef.add(resultadoData)
+      .then(()=> console.log('Dados enviados para Firestore!'))
+      .catch(err=> console.error(err));
 
-    // Mostra na tela local
-    displayResultado([resultadoHTML]);
+    displayResultado([resultadoData]);
+  } else {
+    resultadoDiv.innerHTML = `<p style="color:red;">Por favor, preencha ao menos um campo antes de enviar.</p>`;
   }
 });
 
@@ -143,7 +149,8 @@ function displayResultado(items){
   });
 }
 
-function escapeHtml(str){return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/\n/g,'<br>');}
+function escapeHtml(str){return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+.replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/\n/g,'<br>');}
 
 // Modo Cosmos compartilhado
 const modoCosmosBtn = document.getElementById('modoCosmosBtn');
@@ -151,41 +158,39 @@ modoCosmosBtn.addEventListener('click', ()=>{
   document.body.innerHTML = `<div id="cosmosContainer" style="position:relative;width:100vw;height:100vh;background:#000;"></div>
   <button id="sairCosmos" style="position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
   padding:10px;border-radius:5px;border:none;background:#007acc;color:white;cursor:pointer;font-family:Arial;font-size:12px;">Sair do Modo Cosmos</button>`;
+  
   const container = document.getElementById('cosmosContainer');
-  const positions=[]; const margin=20;
+  const positions = []; const margin = 20;
 
-  // Busca todos os textos do Firebase e exibe
-  cosmosRef.once('value', snapshot=>{
-    const data = snapshot.val();
-    if(data){
-      Object.values(data).forEach(item=>{
-        const div = document.createElement('div');
-        let html='';
-        if(item.relato) html+=`<div class="resultado-item"><strong>Seu relato:</strong> ${escapeHtml(item.relato)}</div>`;
-        if(item.palavra) html+=`<div class="resultado-item"><strong>Sua palavra:</strong> ${escapeHtml(item.palavra)}</div>`;
-        if(item.emocoes?.length) html+=`<div class="resultado-item"><strong>Suas emoções:</strong> ${item.emocoes.map(escapeHtml).join(', ')}</div>`;
-        if(item.queroSentir) html+=`<div class="resultado-item"><strong>O que você quer sentir:</strong> ${escapeHtml(item.queroSentir)}</div>`;
-        div.innerHTML = html;
+  cosmosRef.orderBy('timestamp').get().then(snapshot=>{
+    snapshot.forEach(doc=>{
+      const item = doc.data();
+      const div = document.createElement('div');
+      let html='';
+      if(item.relato) html+=`<div class="resultado-item"><strong>Seu relato:</strong> ${escapeHtml(item.relato)}</div>`;
+      if(item.palavra) html+=`<div class="resultado-item"><strong>Sua palavra:</strong> ${escapeHtml(item.palavra)}</div>`;
+      if(item.emocoes?.length) html+=`<div class="resultado-item"><strong>Suas emoções:</strong> ${item.emocoes.map(escapeHtml).join(', ')}</div>`;
+      if(item.queroSentir) html+=`<div class="resultado-item"><strong>O que você quer sentir:</strong> ${escapeHtml(item.queroSentir)}</div>`;
+      div.innerHTML = html;
 
-        div.style.position='absolute';
-        div.style.background='rgba(1,1,20,0.7)';
-        div.style.color='#e6f7ff';
-        div.style.padding='10px';
-        div.style.borderRadius='8px';
-        div.style.maxWidth='300px';
-        div.style.wordWrap='break-word';
+      div.style.position='absolute';
+      div.style.background='rgba(1,1,20,0.7)';
+      div.style.color='#e6f7ff';
+      div.style.padding='10px';
+      div.style.borderRadius='8px';
+      div.style.maxWidth='300px';
+      div.style.wordWrap='break-word';
 
-        let placed=false;
-        while(!placed){
-          const left=Math.random()*(window.innerWidth-320);
-          const top=Math.random()*(window.innerHeight-120);
-          const rect={left,top,right:left+300+margin,bottom:top+100+margin};
-          const overlap=positions.some(p=>!(rect.right<p.left||rect.left>p.right||rect.bottom<p.top||rect.top>p.bottom));
-          if(!overlap){div.style.left=left+'px'; div.style.top=top+'px'; positions.push(rect); placed=true;}
-        }
-        container.appendChild(div);
-      });
-    }
+      let placed=false;
+      while(!placed){
+        const left=Math.random()*(window.innerWidth-320);
+        const top=Math.random()*(window.innerHeight-120);
+        const rect={left,top,right:left+300+margin,bottom:top+100+margin};
+        const overlap=positions.some(p=>!(rect.right<p.left||rect.left>p.right||rect.bottom<p.top||rect.top>p.bottom));
+        if(!overlap){div.style.left=left+'px'; div.style.top=top+'px'; positions.push(rect); placed=true;}
+      }
+      container.appendChild(div);
+    });
   });
 
   document.getElementById('sairCosmos').addEventListener('click', ()=> location.reload());
