@@ -7,7 +7,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#007acc">
 <style>
-body { font-family: Arial; font-size: 12px; margin: 0; min-height:100vh; background:#f0f8ff; display:flex; justify-content:center; align-items:center; flex-direction:column;}
+body { font-family: Arial; font-size: 12px; margin:0; min-height:100vh; background:#f0f8ff; display:flex; justify-content:center; align-items:center; flex-direction:column;}
 h2 { font-size:20px; text-transform:uppercase; color:#007acc; margin-bottom:20px;}
 .container { display:flex; flex-direction:column; gap:20px; align-items:center; width:95%; max-width:400px;}
 form { background:#fff; padding:20px; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.1); width:100%; display:flex; flex-direction:column;}
@@ -72,22 +72,20 @@ button[type="submit"]:hover, .modo-cosmos:hover { background:#005f99; }
 <div id="resultado"></div>
 </div>
 
-<!-- Firebase SDKs -->
+<!-- Firebase SDKs compatíveis com HTML direto -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
 <script>
-// Configuração Firebase (substitua pelas suas credenciais)
+// Configuração Firebase (suas credenciais)
 const firebaseConfig = {
-  apiKey: "SUA_API_KEY",
-  authDomain: "SEU_PROJETO.firebaseapp.com",
-  projectId: "SEU_PROJETO",
-  storageBucket: "SEU_PROJETO.appspot.com",
-  messagingSenderId: "SENDER_ID",
-  appId: "APP_ID"
+  apiKey: "AIzaSyCwOpPBMXNNjteuSaSUdnQnrn1v20SW6Ao",
+  authDomain: "meu-espaco-terapeutico.firebaseapp.com",
+  projectId: "meu-espaco-terapeutico",
+  storageBucket: "meu-espaco-terapeutico.firebasestorage.app",
+  messagingSenderId: "662859150374",
+  appId: "1:662859150374:web:b282f8fea3e60252a2e2e7"
 };
-
-// Inicializa Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const cosmosRef = db.collection('modoCosmos');
@@ -128,10 +126,11 @@ form.addEventListener('submit', event=>{
     };
     // Salva no Firestore
     cosmosRef.add(resultadoData)
-      .then(()=> console.log('Dados enviados para Firestore!'))
+      .then(()=> {
+        console.log('Dados enviados para Firestore!');
+        displayResultado([resultadoData]); // exibe localmente
+      })
       .catch(err=> console.error(err));
-
-    displayResultado([resultadoData]);
   } else {
     resultadoDiv.innerHTML = `<p style="color:red;">Por favor, preencha ao menos um campo antes de enviar.</p>`;
   }
@@ -149,10 +148,12 @@ function displayResultado(items){
   });
 }
 
-function escapeHtml(str){return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;')
-.replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/\n/g,'<br>');}
+function escapeHtml(str){
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/\n/g,'<br>');
+}
 
-// Modo Cosmos compartilhado
+// Modo Cosmos
 const modoCosmosBtn = document.getElementById('modoCosmosBtn');
 modoCosmosBtn.addEventListener('click', ()=>{
   document.body.innerHTML = `<div id="cosmosContainer" style="position:relative;width:100vw;height:100vh;background:#000;"></div>
@@ -162,6 +163,7 @@ modoCosmosBtn.addEventListener('click', ()=>{
   const container = document.getElementById('cosmosContainer');
   const positions = []; const margin = 20;
 
+  // Lê todos os dados do Firestore
   cosmosRef.orderBy('timestamp').get().then(snapshot=>{
     snapshot.forEach(doc=>{
       const item = doc.data();
