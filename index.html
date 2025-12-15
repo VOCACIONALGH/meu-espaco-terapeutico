@@ -1,14 +1,12 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Como estou esta semana</title>
-
-    <!-- PWA -->
+    <title>MEU ESPAÇO TERAPÊUTICO</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#007acc">
-
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -33,14 +31,15 @@
             flex-direction: column;
             gap: 20px;
             align-items: center;
-            width: 100%;
+            width: 95%;
+            max-width: 400px;
         }
         form {
             background-color: #fff;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            width: 400px;
+            width: 100%;
             display: flex;
             flex-direction: column;
         }
@@ -55,7 +54,7 @@
             border-radius: 5px;
             border: 1px solid #ccc;
             font-family: Arial;
-            margin-bottom: 10px; /* uma linha de distância */
+            margin-bottom: 10px; /* espaçamento vertical */
         }
         textarea {
             height: 150px;
@@ -105,12 +104,10 @@
             padding: 15px;
             background-color: #e6f7ff;
             border-radius: 10px;
-            max-width: 400px;
+            width: 100%;
             word-wrap: break-word;
             min-height: 200px;
             text-align: justify;
-            font-family: Arial;
-            font-size: 12px;
         }
         .resultado-item {
             margin-bottom: 10px;
@@ -126,18 +123,17 @@
 <body>
     <div class="container" id="mainContainer">
         <h2>MEU ESPAÇO TERAPÊUTICO</h2>
-        
+
         <form id="relatoForm">
             <label><b>Quero dizer que...</b></label>
             <label for="meuRelato">Meu relato:</label>
             <textarea id="meuRelato" name="meuRelato" placeholder="Escreva aqui como você está se sentindo..."></textarea>
-            
+
             <label for="palavraMomento">A palavra do momento é:</label>
             <input type="text" id="palavraMomento" name="palavraMomento" placeholder="Digite a palavra do momento...">
-            
+
             <label>Escolha três emoções predominantes:</label>
             <div class="emocoes-list" id="emocoesList">
-                <!-- Botões das emoções (40 itens) -->
                 <button type="button">Alegria</button>
                 <button type="button">Tristeza</button>
                 <button type="button">Raiva</button>
@@ -191,14 +187,102 @@
     </div>
 
     <script>
+        const form = document.getElementById('queroSentirForm');
+        const resultadoDiv = document.getElementById('resultado');
+        const emocoesList = document.getElementById('emocoesList');
+        const modoCosmosBtn = document.getElementById('modoCosmosBtn');
+        let selectedEmocoes = [];
+        let cosmosContent = [];
+
+        emocoesList.querySelectorAll('button').forEach(button => {
+            button.addEventListener('click', () => {
+                const value = button.textContent;
+                if(button.classList.contains('selected')) {
+                    button.classList.remove('selected');
+                    selectedEmocoes = selectedEmocoes.filter(e => e !== value);
+                } else {
+                    if(selectedEmocoes.length < 3) {
+                        button.classList.add('selected');
+                        selectedEmocoes.push(value);
+                    }
+                }
+            });
+        });
+
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const relato = document.getElementById('meuRelato').value.trim();
+            const palavra = document.getElementById('palavraMomento').value.trim();
+            const queroSentir = document.getElementById('queroSentirInput').value.trim();
+
+            if(relato || palavra || selectedEmocoes.length > 0 || queroSentir) {
+                let resultadoHTML = '';
+                if(relato) resultadoHTML += `<div class="resultado-item"><strong>Seu relato:</strong> ${escapeHtml(relato)}</div>`;
+                if(palavra) resultadoHTML += `<div class="resultado-item"><strong>Sua palavra:</strong> ${escapeHtml(palavra)}</div>`;
+                if(selectedEmocoes.length>0) resultadoHTML += `<div class="resultado-item"><strong>Suas emoções:</strong> ${selectedEmocoes.map(escapeHtml).join(', ')}</div>`;
+                if(queroSentir) resultadoHTML += `<div class="resultado-item"><strong>O que você quer sentir:</strong> ${escapeHtml(queroSentir)}</div>`;
+                resultadoDiv.innerHTML = resultadoHTML;
+
+                // Adiciona ao cosmosContent
+                cosmosContent.push(resultadoHTML);
+            } else {
+                resultadoDiv.innerHTML = `<p style="color:red;">Por favor, preencha ao menos um campo antes de enviar.</p>`;
+            }
+        });
+
+        modoCosmosBtn.addEventListener('click', () => {
+            document.body.innerHTML = `<div id="cosmosContainer" style="position:relative;width:100vw;height:100vh;background-color:#000;"></div>
+                <button id="sairCosmos" style="position:fixed;bottom:20px;left:50%;transform:translateX(-50%);padding:10px;border-radius:5px;border:none;background-color:#007acc;color:white;cursor:pointer;font-family:Arial;font-size:12px;">Sair do Modo Cosmos</button>`;
+            const container = document.getElementById('cosmosContainer');
+            const positions = [];
+            const margin = 20;
+
+            cosmosContent.forEach(item => {
+                const div = document.createElement('div');
+                div.innerHTML = item;
+                div.style.position = 'absolute';
+                div.style.backgroundColor = 'rgba(1,1,20,0.7)';
+                div.style.color = '#e6f7ff';
+                div.style.padding = '10px';
+                div.style.borderRadius = '8px';
+                div.style.maxWidth = '300px';
+                div.style.wordWrap = 'break-word';
+
+                let placed = false;
+                while(!placed) {
+                    const left = Math.random()*(window.innerWidth-320);
+                    const top = Math.random()*(window.innerHeight-120);
+                    const rect = {left, top, right:left+300+margin, bottom:top+100+margin};
+                    const overlap = positions.some(p => !(rect.right<p.left || rect.left>p.right || rect.bottom<p.top || rect.top>p.bottom));
+                    if(!overlap) {
+                        div.style.left = left+'px';
+                        div.style.top = top+'px';
+                        positions.push(rect);
+                        placed = true;
+                    }
+                }
+                container.appendChild(div);
+            });
+
+            document.getElementById('sairCosmos').addEventListener('click', ()=> location.reload());
+        });
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g,'&amp;')
+                .replace(/</g,'&lt;')
+                .replace(/>/g,'&gt;')
+                .replace(/"/g,'&quot;')
+                .replace(/'/g,'&#39;')
+                .replace(/\n/g,'<br>');
+        }
+
         // Registrar service worker
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                navigator.serviceWorker.register('service-worker.js').then(function(registration) {
-                    console.log('ServiceWorker registrado com sucesso:', registration.scope);
-                }, function(err) {
-                    console.log('Falha ao registrar ServiceWorker:', err);
-                });
+        if('serviceWorker' in navigator){
+            window.addEventListener('load', function(){
+                navigator.serviceWorker.register('service-worker.js')
+                .then(reg=>console.log('SW registrado:', reg.scope))
+                .catch(err=>console.log('Falha SW:',err));
             });
         }
     </script>
