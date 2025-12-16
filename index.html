@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -6,232 +6,441 @@
 <title>MEU ESPAÇO TERAPÊUTICO</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#007acc">
-
 <style>
-body {
-  font-family: Arial;
-  font-size: 12px;
-  margin:0;
-  min-height:100vh;
-  background:#f0f8ff;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  flex-direction:column;
-}
-
-h2 {
-  font-size:20px;
-  text-transform:uppercase;
-  color:#007acc;
-  margin-bottom:20px;
-}
-
-.container {
-  display:flex;
-  flex-direction:column;
-  gap:20px;
-  align-items:center;
-  width:95%;
-  max-width:400px;
-}
-
-form {
-  background:#fff;
-  padding:20px;
-  border-radius:10px;
-  box-shadow:0 0 10px rgba(0,0,0,0.1);
-  width:100%;
-  display:flex;
-  flex-direction:column;
-}
-
-textarea, input[type="text"], .emocoes-list button {
-  width:100%;
-  padding:10px;
-  font-size:12px;
-  border-radius:5px;
-  border:1px solid #ccc;
-  margin-bottom:10px;
-}
-
+body { font-family: Arial; font-size: 12px; margin:0; min-height:100vh; background:#f0f8ff; display:flex; justify-content:center; align-items:center; flex-direction:column;}
+h2 { font-size:20px; text-transform:uppercase; color:#007acc; margin-bottom:20px;}
+.container { display:flex; flex-direction:column; gap:20px; align-items:center; width:95%; max-width:400px;}
+form { background:#fff; padding:20px; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.1); width:100%; display:flex; flex-direction:column;}
+form label { font-weight:bold; margin-bottom:5px; }
+textarea, input[type="text"], .emocoes-list button { width:100%; padding:10px; font-size:12px; border-radius:5px; border:1px solid #ccc; font-family:Arial; margin-bottom:10px; }
 textarea { height:150px; resize:vertical; }
-
-.emocoes-list {
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:5px;
-  max-height:200px;
-  overflow-y:auto;
-  border:1px solid #ccc;
-  padding:5px;
-  border-radius:5px;
-}
-
-.emocoes-list button {
-  cursor:pointer;
-  background:#fff;
-  border:1px solid #007acc;
-  color:#007acc;
-}
-
-.emocoes-list button.selected {
-  background:#007acc;
-  color:#fff;
-}
-
-button {
-  margin-top:15px;
-  border:none;
-  background:#007acc;
-  color:#fff;
-  cursor:pointer;
-  font-size:12px;
-  border-radius:5px;
-  padding:10px;
-}
-
-#resultado {
-  padding:15px;
-  background:#e6f7ff;
-  border-radius:10px;
-  width:100%;
-  min-height:200px;
-}
-
+.emocoes-list { display:grid; grid-template-columns:repeat(2,1fr); gap:5px; max-height:200px; overflow-y:auto; border:1px solid #ccc; padding:5px; border-radius:5px; margin-bottom:10px; }
+.emocoes-list button { cursor:pointer; background:#fff; border:1px solid #007acc; color:#007acc; border-radius:5px; font-family:Arial; font-size:12px; padding:8px; text-align:center; }
+.emocoes-list button.selected { background:#007acc; color:#fff; }
+button[type="submit"], .modo-cosmos { margin-top:15px; border:none; background:#007acc; color:#fff; cursor:pointer; font-size:12px; border-radius:5px; font-family:Arial; padding:10px; }
+button[type="submit"]:hover, .modo-cosmos:hover { background:#005f99; }
+#resultado { padding:15px; background:#e6f7ff; border-radius:10px; width:100%; word-wrap:break-word; min-height:200px; text-align:justify; }
 .resultado-item { margin-bottom:10px; }
+.resultado-item strong { display:inline-block; width:140px; text-align:right; margin-right:10px; }
 
-/* ================= MODO COSMOS ================= */
+/* --- Estilos para o Modo Cosmos infinito --- */
+.cosmos-root { position:fixed; inset:0; background:#000; display:flex; flex-direction:column; }
+.cosmos-toolbar { position:fixed; top:10px; left:50%; transform:translateX(-50%); z-index:60; display:flex; gap:8px; align-items:center; background:rgba(0,0,0,0.4); padding:8px; border-radius:8px; backdrop-filter: blur(4px); }
+.cosmos-toolbar button { background:#007acc; color:white; border:none; padding:8px 10px; border-radius:6px; cursor:pointer; font-family:Arial; font-size:13px; }
+.cosmos-toolbar .label { color:#e6f7ff; margin-right:6px; font-size:13px; }
+.cosmos-wrapper { position:relative; flex:1; overflow:auto; cursor:grab; }
+.cosmos-space { position:relative; transform-origin: 0 0; /* important */ }
+.cosmos-item { position:absolute; background:rgba(1,1,20,0.8); color:#e6f7ff; padding:10px; border-radius:8px; max-width:300px; word-wrap:break-word; box-shadow: 0 6px 18px rgba(0,0,0,0.5); }
+.cosmos-exit { position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
+  padding:10px;border-radius:5px;border:none;background:#007acc;color:white;cursor:pointer;font-family:Arial;font-size:12px; z-index:60;}
+.cosmos-hint { position:fixed; top:10px; right:10px; color:#e6f7ff; background:rgba(255,255,255,0.04); padding:6px 8px; border-radius:6px; font-size:12px; z-index:50; }
 
-#cosmosViewport {
-  position:fixed;
-  inset:0;
-  background:#000;
-  overflow:auto;
-}
+/* make text selectable inside items */
+.cosmos-item * { user-select:text; }
 
-#cosmosWorld {
-  position:relative;
-  width:10000px;
-  height:10000px;
-  transform-origin: 0 0;
-}
-
-.cosmos-item {
-  position:absolute;
-  background:rgba(1,1,20,0.75);
-  color:#e6f7ff;
-  padding:10px;
-  border-radius:8px;
-  max-width:300px;
-  font-size:12px;
-  box-shadow:0 0 10px rgba(0,0,0,0.5);
-}
-
-#cosmosControls {
-  position:fixed;
-  bottom:15px;
-  left:50%;
-  transform:translateX(-50%);
-  display:flex;
-  gap:10px;
-  z-index:9999;
-}
-
-#cosmosControls button {
-  background:#007acc;
-  padding:8px 12px;
-  font-size:12px;
+/* small responsive tweak */
+@media (max-width:480px){
+  .container { max-width:95%; }
+  .cosmos-toolbar { top:auto; bottom:80px; left:10px; transform:none; }
 }
 </style>
 </head>
-
 <body>
 <div class="container" id="mainContainer">
 <h2>MEU ESPAÇO TERAPÊUTICO</h2>
 
-<form>
+<form id="relatoForm">
+<label><b>Quero dizer que...</b></label>
+<label for="meuRelato">Meu relato:</label>
 <textarea id="meuRelato" placeholder="Escreva aqui como você está se sentindo..."></textarea>
-<input type="text" id="palavraMomento" placeholder="Palavra do momento">
+
+<label for="palavraMomento">A palavra do momento é:</label>
+<input type="text" id="palavraMomento" placeholder="Digite a palavra do momento...">
+
+<label>Escolha três emoções predominantes:</label>
 <div class="emocoes-list" id="emocoesList">
+<!-- 40 emoções -->
 <button type="button">Alegria</button><button type="button">Tristeza</button>
 <button type="button">Raiva</button><button type="button">Medo</button>
+<button type="button">Surpresa</button><button type="button">Nojo</button>
 <button type="button">Amor</button><button type="button">Calma</button>
 <button type="button">Ansiedade</button><button type="button">Esperança</button>
+<button type="button">Solidão</button><button type="button">Culpa</button>
+<button type="button">Orgulho</button><button type="button">Frustração</button>
+<button type="button">Confiança</button><button type="button">Tédio</button>
+<button type="button">Admiração</button><button type="button">Compaixão</button>
+<button type="button">Inveja</button><button type="button">Gratidão</button>
+<button type="button">Entusiasmo</button><button type="button">Decepção</button>
+<button type="button">Paz</button><button type="button">Ira</button>
+<button type="button">Desânimo</button><button type="button">Curiosidade</button>
+<button type="button">Alívio</button><button type="button">Empolgação</button>
+<button type="button">Confusão</button><button type="button">Inquietação</button>
+<button type="button">Admiração leve</button><button type="button">Saudade</button>
+<button type="button">Orgulho leve</button><button type="button">Solidariedade</button>
+<button type="button">Surpresa positiva</button><button type="button">Medo leve</button>
+<button type="button">Raiva contida</button><button type="button">Satisfação</button>
+<button type="button">Altruísmo</button>
 </div>
 </form>
 
 <form id="queroSentirForm">
-<input type="text" id="queroSentirInput" placeholder="Quero sentir que...">
+<label><b>Quero sentir que...</b></label>
+<input type="text" id="queroSentirInput" placeholder="tudo vai dar certo...">
 <button type="submit">Ressignificar</button>
-<button type="button" id="modoCosmosBtn">Modo Cosmos</button>
+<button type="button" class="modo-cosmos" id="modoCosmosBtn">Modo Cosmos</button>
 </form>
 
 <div id="resultado"></div>
 </div>
 
+<!-- Firebase SDKs compatíveis com HTML direto -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
 <script>
+// Configuração Firebase (suas credenciais)
 const firebaseConfig = {
   apiKey: "AIzaSyCwOpPBMXNNjteuSaSUdnQnrn1v20SW6Ao",
   authDomain: "meu-espaco-terapeutico.firebaseapp.com",
-  projectId: "meu-espaco-terapeutico"
+  projectId: "meu-espaco-terapeutico",
+  storageBucket: "meu-espaco-terapeutico.firebasestorage.app",
+  messagingSenderId: "662859150374",
+  appId: "1:662859150374:web:b282f8fea3e60252a2e2e7"
 };
-
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const cosmosRef = db.collection('modoCosmos');
 
-function escapeHtml(str){
-  return String(str).replace(/&/g,'&amp;')
-    .replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;').replace(/'/g,'&#39;')
-    .replace(/\n/g,'<br>');
+// Seleção de emoções
+const emocoesList = document.getElementById('emocoesList');
+let selectedEmocoes = [];
+emocoesList.querySelectorAll('button').forEach(button=>{
+  button.addEventListener('click', ()=>{
+    const value = button.textContent;
+    if(button.classList.contains('selected')){
+      button.classList.remove('selected');
+      selectedEmocoes = selectedEmocoes.filter(e=>e!==value);
+    } else if(selectedEmocoes.length<3){
+      button.classList.add('selected');
+      selectedEmocoes.push(value);
+    }
+  });
+});
+
+// Enviar formulário e salvar no Firestore
+const form = document.getElementById('queroSentirForm');
+const resultadoDiv = document.getElementById('resultado');
+
+form.addEventListener('submit', event=>{
+  event.preventDefault();
+  const relato = document.getElementById('meuRelato').value.trim();
+  const palavra = document.getElementById('palavraMomento').value.trim();
+  const queroSentir = document.getElementById('queroSentirInput').value.trim();
+
+  if(relato || palavra || selectedEmocoes.length > 0 || queroSentir){
+    const resultadoData = {
+      relato,
+      palavra,
+      emocoes: selectedEmocoes,
+      queroSentir,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    // Salva no Firestore
+    cosmosRef.add(resultadoData)
+      .then(()=> {
+        console.log('Dados enviados para Firestore!');
+        displayResultado([resultadoData]); // exibe localmente
+      })
+      .catch(err=> console.error(err));
+  } else {
+    resultadoDiv.innerHTML = `<p style="color:red;">Por favor, preencha ao menos um campo antes de enviar.</p>`;
+  }
+});
+
+function displayResultado(items){
+  resultadoDiv.innerHTML = '';
+  items.forEach(item=>{
+    let html='';
+    if(item.relato) html+=`<div class="resultado-item"><strong>Seu relato:</strong> ${escapeHtml(item.relato)}</div>`;
+    if(item.palavra) html+=`<div class="resultado-item"><strong>Sua palavra:</strong> ${escapeHtml(item.palavra)}</div>`;
+    if(item.emocoes?.length) html+=`<div class="resultado-item"><strong>Suas emoções:</strong> ${item.emocoes.map(escapeHtml).join(', ')}</div>`;
+    if(item.queroSentir) html+=`<div class="resultado-item"><strong>O que você quer sentir:</strong> ${escapeHtml(item.queroSentir)}</div>`;
+    resultadoDiv.innerHTML += html;
+  });
 }
 
-document.getElementById('modoCosmosBtn').addEventListener('click', ()=>{
-  document.body.innerHTML = `
-    <div id="cosmosViewport">
-      <div id="cosmosWorld"></div>
-    </div>
+function escapeHtml(str){
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/\n/g,'<br>');
+}
 
-    <div id="cosmosControls">
-      <button id="zoomOut">−</button>
-      <button id="zoomIn">+</button>
-      <button id="sairCosmos">Sair</button>
+// --- MODO COSMOS "INFINITO" ---
+const modoCosmosBtn = document.getElementById('modoCosmosBtn');
+
+modoCosmosBtn.addEventListener('click', ()=> {
+  // Substitui body (mantendo comportamento original) por interface do Modo Cosmos + recursos novos
+  document.body.innerHTML = `
+    <div class="cosmos-root" id="cosmosRoot">
+      <div class="cosmos-toolbar" id="cosmosToolbar">
+        <span class="label">Zoom:</span>
+        <button id="zoomOutBtn">−</button>
+        <button id="resetZoomBtn">100%</button>
+        <button id="zoomInBtn">+</button>
+        <button id="fitBtn">Ajustar</button>
+      </div>
+      <div class="cosmos-hint">Use mouse arrastar para movimentar; scroll para rolar; teclas +/- para zoom</div>
+      <div class="cosmos-wrapper" id="cosmosWrapper">
+        <div class="cosmos-space" id="cosmosSpace"></div>
+      </div>
+      <button id="sairCosmos" class="cosmos-exit">Sair do Modo Cosmos</button>
     </div>
   `;
 
-  const world = document.getElementById('cosmosWorld');
-  let scale = 1;
+  const cosmosWrapper = document.getElementById('cosmosWrapper');
+  const cosmosSpace = document.getElementById('cosmosSpace');
+  const sairBtn = document.getElementById('sairCosmos');
 
+  // Estado do espaço "infinito"
+  let spaceWidth = Math.max(window.innerWidth * 2, 5000);
+  let spaceHeight = Math.max(window.innerHeight * 2, 5000);
+  cosmosSpace.style.width = spaceWidth + 'px';
+  cosmosSpace.style.height = spaceHeight + 'px';
+
+  // transform scale (zoom)
+  let scale = 1;
+  function applyScale() {
+    cosmosSpace.style.transform = `scale(${scale})`;
+  }
+  applyScale();
+
+  // panning (drag to scroll)
+  let isPanning = false, startX=0, startY=0, startScrollLeft=0, startScrollTop=0;
+  cosmosWrapper.addEventListener('mousedown', (e)=>{
+    // only left button
+    if(e.button !== 0) return;
+    isPanning = true;
+    cosmosWrapper.style.cursor = 'grabbing';
+    startX = e.clientX;
+    startY = e.clientY;
+    startScrollLeft = cosmosWrapper.scrollLeft;
+    startScrollTop = cosmosWrapper.scrollTop;
+  });
+  window.addEventListener('mousemove', (e)=>{
+    if(!isPanning) return;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    cosmosWrapper.scrollLeft = startScrollLeft - dx;
+    cosmosWrapper.scrollTop = startScrollTop - dy;
+  });
+  window.addEventListener('mouseup', ()=> {
+    if(isPanning) {
+      isPanning = false;
+      cosmosWrapper.style.cursor = 'grab';
+    }
+  });
+
+  // touch drag support (for tablets)
+  let touchStartX=0, touchStartY=0, touchScrollLeft=0, touchScrollTop=0, isTouchPanning=false;
+  cosmosWrapper.addEventListener('touchstart', (e)=>{
+    if(e.touches.length===1){
+      isTouchPanning = true;
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+      touchScrollLeft = cosmosWrapper.scrollLeft;
+      touchScrollTop = cosmosWrapper.scrollTop;
+    }
+  }, {passive:true});
+  cosmosWrapper.addEventListener('touchmove', (e)=>{
+    if(!isTouchPanning || e.touches.length!==1) return;
+    const dx = e.touches[0].clientX - touchStartX;
+    const dy = e.touches[0].clientY - touchStartY;
+    cosmosWrapper.scrollLeft = touchScrollLeft - dx;
+    cosmosWrapper.scrollTop = touchScrollTop - dy;
+  }, {passive:true});
+  cosmosWrapper.addEventListener('touchend', ()=> { isTouchPanning=false; });
+
+  // Zoom controls
+  const zoomInBtn = document.getElementById('zoomInBtn');
+  const zoomOutBtn = document.getElementById('zoomOutBtn');
+  const resetZoomBtn = document.getElementById('resetZoomBtn');
+  const fitBtn = document.getElementById('fitBtn');
+
+  function setScale(newScale, centerX=null, centerY=null){
+    // preserve viewport center roughly
+    // compute current viewport center in space coords
+    if(centerX===null || centerY===null){
+      // keep scroll ratio when scaling
+      const prevScrollLeft = cosmosWrapper.scrollLeft;
+      const prevScrollTop = cosmosWrapper.scrollTop;
+      const ratioX = prevScrollLeft / (cosmosSpace.clientWidth*scale || 1);
+      const ratioY = prevScrollTop / (cosmosSpace.clientHeight*scale || 1);
+      scale = newScale;
+      applyScale();
+      // adjust scroll to keep approximate position
+      cosmosWrapper.scrollLeft = ratioX * (cosmosSpace.clientWidth*scale);
+      cosmosWrapper.scrollTop = ratioY * (cosmosSpace.clientHeight*scale);
+    } else {
+      // not used currently
+      scale = newScale;
+      applyScale();
+    }
+    resetZoomBtn.textContent = Math.round(scale*100) + '%';
+  }
+
+  zoomInBtn.addEventListener('click', ()=> setScale(Math.min(scale * 1.2, 4)));
+  zoomOutBtn.addEventListener('click', ()=> setScale(Math.max(scale / 1.2, 0.2)));
+  resetZoomBtn.addEventListener('click', ()=> setScale(1));
+  fitBtn.addEventListener('click', ()=> {
+    // fit all items into view (simple heuristic)
+    const bounds = getAllItemsBounds();
+    if(!bounds) return;
+    const viewW = cosmosWrapper.clientWidth;
+    const viewH = cosmosWrapper.clientHeight;
+    const neededScale = Math.min(viewW / bounds.w, viewH / bounds.h, 1);
+    setScale(Math.max(neededScale, 0.2));
+    // center
+    cosmosWrapper.scrollLeft = bounds.left * scale - (viewW - bounds.w * scale)/2;
+    cosmosWrapper.scrollTop = bounds.top * scale - (viewH - bounds.h * scale)/2;
+  });
+
+  // keyboard zoom (+/-)
+  window.addEventListener('keydown', (e)=>{
+    if(e.key === '+' || e.key === '=') { setScale(Math.min(scale * 1.2, 4)); }
+    if(e.key === '-') { setScale(Math.max(scale / 1.2, 0.2)); }
+    if(e.key === '0') { setScale(1); }
+  });
+
+  // adding items: prevent duplicates using IDs
+  const placedPositions = []; // rectangles for overlap detection
+  const knownDocIds = new Set();
+
+  function getAllItemsBounds(){
+    const items = Array.from(cosmosSpace.querySelectorAll('.cosmos-item'));
+    if(items.length === 0) return null;
+    let left = Infinity, top = Infinity, right = -Infinity, bottom = -Infinity;
+    items.forEach(it => {
+      const l = parseFloat(it.style.left || 0);
+      const t = parseFloat(it.style.top || 0);
+      const w = it.offsetWidth;
+      const h = it.offsetHeight;
+      left = Math.min(left, l);
+      top = Math.min(top, t);
+      right = Math.max(right, l + w);
+      bottom = Math.max(bottom, t + h);
+    });
+    return { left, top, w: right - left, h: bottom - top };
+  }
+
+  function maybeExpandSpaceIfNeeded(x, y, w=300, h=120){
+    const padding = 600;
+    let changed = false;
+    if(x + w + padding > spaceWidth){
+      spaceWidth = Math.max(spaceWidth * 1.5, x + w + padding);
+      cosmosSpace.style.width = spaceWidth + 'px';
+      changed = true;
+    }
+    if(y + h + padding > spaceHeight){
+      spaceHeight = Math.max(spaceHeight * 1.5, y + h + padding);
+      cosmosSpace.style.height = spaceHeight + 'px';
+      changed = true;
+    }
+    return changed;
+  }
+
+  function addOrUpdateItemFromDoc(doc){
+    if(!doc || !doc.id) return;
+    if(knownDocIds.has(doc.id)) return; // skip duplicates
+    const item = doc.data();
+    // create element
+    const div = document.createElement('div');
+    div.className = 'cosmos-item';
+    div.dataset.docId = doc.id;
+    let html='';
+    if(item.relato) html+=`<div class="resultado-item"><strong>Seu relato:</strong> ${escapeHtml(item.relato)}</div>`;
+    if(item.palavra) html+=`<div class="resultado-item"><strong>Sua palavra:</strong> ${escapeHtml(item.palavra)}</div>`;
+    if(item.emocoes?.length) html+=`<div class="resultado-item"><strong>Suas emoções:</strong> ${item.emocoes.map(escapeHtml).join(', ')}</div>`;
+    if(item.queroSentir) html+=`<div class="resultado-item"><strong>O que você quer sentir:</strong> ${escapeHtml(item.queroSentir)}</div>`;
+    div.innerHTML = html;
+
+    // default size guess (will be updated after adding to DOM)
+    div.style.left = '0px';
+    div.style.top = '0px';
+    cosmosSpace.appendChild(div);
+
+    // measure size
+    const w = Math.min(300, div.offsetWidth);
+    const h = Math.max(60, div.offsetHeight);
+
+    // find non-overlapping random position inside space
+    let placed = false;
+    let attempts = 0;
+    while(!placed && attempts < 2000){
+      attempts++;
+      const left = Math.floor(Math.random() * Math.max(0, (spaceWidth - w - 200)));
+      const top = Math.floor(Math.random() * Math.max(0, (spaceHeight - h - 200)));
+      const rect = { left, top, right: left + w + 20, bottom: top + h + 20 };
+      const overlap = placedPositions.some(p => !(rect.right < p.left || rect.left > p.right || rect.bottom < p.top || rect.top > p.bottom));
+      if(!overlap){
+        div.style.left = left + 'px';
+        div.style.top = top + 'px';
+        placedPositions.push(rect);
+        placed = true;
+        // expand if near edges
+        maybeExpandSpaceIfNeeded(left, top, w, h);
+      }
+    }
+    // if couldn't place without overlap, just append at random near center
+    if(!placed){
+      const left = Math.floor(Math.random() * Math.max(0, (spaceWidth - w - 200)));
+      const top = Math.floor(Math.random() * Math.max(0, (spaceHeight - h - 200)));
+      div.style.left = left + 'px';
+      div.style.top = top + 'px';
+      placedPositions.push({ left, top, right: left + w + 20, bottom: top + h + 20 });
+      maybeExpandSpaceIfNeeded(left, top, w, h);
+    }
+
+    knownDocIds.add(doc.id);
+  }
+
+  // initial load: get existing docs (ordered) and place them
   cosmosRef.orderBy('timestamp').get().then(snapshot=>{
-    snapshot.forEach(()=>{
-      const div = document.createElement('div');
-      div.className = 'cosmos-item';
-      div.innerHTML = `
-        <strong>Relato coletivo</strong><br><br>
-        Um fragmento emocional compartilhado.
-      `;
-      div.style.left = Math.random()*9500 + 'px';
-      div.style.top  = Math.random()*9500 + 'px';
-      world.appendChild(div);
+    snapshot.forEach(doc => {
+      addOrUpdateItemFromDoc(doc);
+    });
+    // after load, center view to middle
+    cosmosWrapper.scrollLeft = (cosmosSpace.clientWidth * scale - cosmosWrapper.clientWidth) / 2;
+    cosmosWrapper.scrollTop = (cosmosSpace.clientHeight * scale - cosmosWrapper.clientHeight) / 2;
+  });
+
+  // realtime listener: adiciona novos documentos automaticamente enquanto estiver no modo
+  const unsubscribe = cosmosRef.orderBy('timestamp').onSnapshot(snapshot=>{
+    snapshot.docChanges().forEach(change => {
+      if(change.type === 'added'){
+        addOrUpdateItemFromDoc(change.doc);
+      }
+      // we intentionally do not handle 'modified' or 'removed' specially to respect original program behavior
     });
   });
 
-  document.getElementById('zoomIn').onclick = ()=>{
-    scale += 0.1;
-    world.style.transform = `scale(${scale})`;
-  };
+  // helper para calcular bounds quando necessário
+  function computeSpaceBounds(){
+    return { w: spaceWidth, h: spaceHeight };
+  }
 
-  document.getElementById('zoomOut').onclick = ()=>{
-    scale = Math.max(0.2, scale - 0.1);
-    world.style.transform = `scale(${scale})`;
-  };
+  // sair do modo cosmos
+  sairBtn.addEventListener('click', ()=>{
+    // stop realtime listener
+    if(typeof unsubscribe === 'function') unsubscribe();
+    location.reload();
+  });
 
-  document.getElementById('sairCosmos').onclick = ()=>location.reload();
+  // make sure window resize adjusts minimal space size
+  window.addEventListener('resize', ()=>{
+    const minW = Math.max(window.innerWidth * 1.5, 3000);
+    const minH = Math.max(window.innerHeight * 1.5, 3000);
+    if(spaceWidth < minW){ spaceWidth = minW; cosmosSpace.style.width = spaceWidth + 'px'; }
+    if(spaceHeight < minH){ spaceHeight = minH; cosmosSpace.style.height = spaceHeight + 'px'; }
+  }, {passive:true});
 });
 </script>
 </body>
